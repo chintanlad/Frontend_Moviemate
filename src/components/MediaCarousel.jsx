@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import MediaCard from "./MediaCard"
+import MediaCard from "./MediaCard.jsx"
 
 const MOCK_DATA = [
   {
@@ -35,6 +35,55 @@ const MOCK_DATA = [
     type: "game",
     score: 80,
     reviewCount: 72,
+    image: "/placeholder.svg?height=160&width=280",
+  },
+  // Add 6 more items to match the requirement
+  {
+    id: 5,
+    title: "The Last of Us",
+    type: "tv show",
+    score: 85,
+    reviewCount: 95,
+    image: "/placeholder.svg?height=160&width=280",
+  },
+  {
+    id: 6,
+    title: "Dune: Part Two",
+    type: "movie",
+    score: 88,
+    reviewCount: 45,
+    image: "/placeholder.svg?height=160&width=280",
+  },
+  {
+    id: 7,
+    title: "Final Fantasy VII Rebirth",
+    type: "game",
+    score: 92,
+    reviewCount: 83,
+    image: "/placeholder.svg?height=160&width=280",
+  },
+  {
+    id: 8,
+    title: "True Detective: Night Country",
+    type: "tv show",
+    score: 78,
+    reviewCount: 64,
+    image: "/placeholder.svg?height=160&width=280",
+  },
+  {
+    id: 9,
+    title: "Helldivers 2",
+    type: "game",
+    score: 81,
+    reviewCount: 55,
+    image: "/placeholder.svg?height=160&width=280",
+  },
+  {
+    id: 10,
+    title: "Poor Things",
+    type: "movie",
+    score: 87,
+    reviewCount: 91,
     image: "/placeholder.svg?height=160&width=280",
   },
 ]
@@ -72,10 +121,17 @@ export default function MediaCarousel() {
         </div>
       </div>
 
-      <div className="mt-4 flex space-x-4 overflow-hidden">
-        {MOCK_DATA.slice(startIndex, startIndex + 4).map((item) => (
-          <MediaCard key={item.id} item={item} />
-        ))}
+      <div className="mt-4">
+        <div
+          className="flex transition-transform duration-300 ease-in-out"
+          style={{ transform: `translateX(-${startIndex * 288}px)` }}
+        >
+          {MOCK_DATA.map((item) => (
+            <div key={item.id} className="w-72 flex-shrink-0 px-2">
+              <MediaCard item={item} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
