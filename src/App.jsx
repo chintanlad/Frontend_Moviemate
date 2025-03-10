@@ -7,13 +7,15 @@ import MediaCarousel from "./components/MediaCarousel"
 import AuthModal from "./components/AuthModel"
 import MediaDetail from "./pages/MediaDetails"
 import WatchList from "./pages/WatchList"
+import { useAuth } from "./utils/authContext"
+import ProtectedRoute from "./utils/protectedRoute"
 
 export default function App() 
 {
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
     const [activeAuthTab, setActiveAuthTab] = useState("register")
     const [watchLaterList, setWatchLaterList] = useState([])
-
+    const {isLoggedin} = useAuth();
     const handleWatchLater = (item) => 
     {
         setWatchLaterList((prev) => 
@@ -24,7 +26,10 @@ export default function App()
     }
 
     return (
+        <>
+        
         <div className="min-h-screen bg-gray-50">
+        <ProtectedRoute>
             <Navbar
                 onRegisterClick={() => 
                 {
@@ -44,13 +49,9 @@ export default function App()
                 <Route path="/title/:id" element={<MediaDetail onWatchLater={handleWatchLater} />} />
                 <Route path="/watchlist" element={<WatchList items={watchLaterList} onWatchLater={handleWatchLater} />} />
             </Routes>
-            <AuthModal
-                isOpen={isAuthModalOpen}
-                onClose={() => setIsAuthModalOpen(false)}
-                activeTab={activeAuthTab}
-                onTabChange={setActiveAuthTab}
-            />
+        </ProtectedRoute>
         </div>
+        </>
     )
 }
 

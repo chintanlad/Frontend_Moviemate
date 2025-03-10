@@ -1,11 +1,32 @@
 "use client"
 
-import { useState, React } from "react"
-import { Link } from "react-router-dom"
+import { useState, useEffect,React } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import { Search, User, Clock, ChevronDown } from "lucide-react"
+import axiosInstance from "../utils/axiosConfig"
+import { useAuth } from "../utils/authContext"
 
-export default function Navbar({ onRegisterClick }) {
+export default function Navbar({ onLogoutClick }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const {isLoggedIn,setIsLoggedIn} = useAuth()
+  const navigate = useNavigate()
+  useEffect(() => {
+      if (!isLoggedIn) {
+        navigate("/"); // Navigate when logged in changes to true
+      }
+    }, [isLoggedIn, navigate]);
+  const handleLogout = async () => {
+    
+      try{
+        const res = await axiosInstance.post("/user/logout");
+        setIsLoggedIn(false);
+        navigate("/");
+        window.location.reload()
+      }
+      catch(e){
+        console.log(e);
+      }
+  }
 
   return (
     <nav className="bg-black">
@@ -16,11 +37,7 @@ export default function Navbar({ onRegisterClick }) {
               Metacritic
             </Link>
             <div className="hidden md:flex space-x-6">
-              <NavLink href="/games">Games</NavLink>
               <NavLink href="/movies">Movies</NavLink>
-              <NavLink href="/tv">TV Shows</NavLink>
-              <NavLink href="/music">Music</NavLink>
-              <NavLink href="/news">News</NavLink>
             </div>
           </div>
 
@@ -57,10 +74,10 @@ export default function Navbar({ onRegisterClick }) {
             </div>
 
             <button
-              onClick={onRegisterClick}
-              className="rounded-full bg-yellow-500 px-6 py-2 font-medium text-black hover:bg-yellow-400"
+              onClick={handleLogout}
+              className="rounded-full bg-red-500 px-6 py-2 font-medium text-white hover:bg-red-400"
             >
-              Register
+              Logout
             </button>
           </div>
         </div>
@@ -136,59 +153,3 @@ function ProfileMenu({ onClose }) {
     </div>
   )
 }
-
-
-
-
-// import { Search } from "lucide-react"
-
-// export default function Navbar({ onRegisterClick }) {
-//   return (
-//     <nav className="bg-black text-white">
-//       <div className="container mx-auto px-4">
-//         <div className="flex h-14 items-center justify-between">
-//           <div className="flex items-center space-x-8">
-//             <img
-//               src="https://www.metacritic.com/images/icons/metacritic-icon.svg"
-//               alt="Metacritic"
-//               className="h-8 w-8"
-//             />
-//             <div className="hidden md:flex space-x-6">
-//               <NavLink href="#">Games</NavLink>
-//               <NavLink href="#">Movies</NavLink>
-//               <NavLink href="#">TV Shows</NavLink>
-//               <NavLink href="#">Music</NavLink>
-//               <NavLink href="#">News</NavLink>
-//             </div>
-//           </div>
-
-//           <div className="flex items-center space-x-4">
-//             <div className="relative">
-//               <input
-//                 type="search"
-//                 placeholder="Search"
-//                 className="w-48 md:w-64 rounded-md bg-white px-4 py-1.5 pr-8 text-black"
-//               />
-//               <Search className="absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-//             </div>
-//             <button
-//               onClick={onRegisterClick}
-//               className="rounded bg-yellow-500 px-4 py-1.5 font-medium text-black hover:bg-yellow-400"
-//             >
-//               Register
-//             </button>
-//           </div>
-//         </div>
-//       </div>
-//     </nav>
-//   )
-// }
-
-// function NavLink({ href, children }) {
-//   return (
-//     <a href={href} className="text-sm font-medium text-gray-200 hover:text-white">
-//       {children}
-//     </a>
-//   )
-// }
-
