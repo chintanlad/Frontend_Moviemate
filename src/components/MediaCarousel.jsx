@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, React } from "react"
+import { useState, React, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import MediaCard from "./MediaCard"
+import axiosInstance from "../utils/axiosConfig"
 
 const MOCK_DATA = [
   { id: 1, title: "Item 1", imageUrl: "url1" },
@@ -17,6 +18,22 @@ const MOCK_DATA = [
 
 export default function MediaCarousel({ items = MOCK_DATA, onWatchLater }) {
   const [startIndex, setStartIndex] = useState(0)
+  const [data,setData] = useState([]);
+
+  const fetchData = async()=>{
+    try{
+      const res = await axiosInstance.get("/user/getTopMovies");
+      console.log(res.data.data);
+      setData(res.data.data)
+    }
+    catch(e){
+      console.log(e);
+    }
+  }
+
+  useEffect(()=>{
+    fetchData()
+  })
 
   const showPrevious = () => {
     setStartIndex(Math.max(0, startIndex - 1))
@@ -53,7 +70,7 @@ export default function MediaCarousel({ items = MOCK_DATA, onWatchLater }) {
           className="flex transition-transform duration-300 ease-in-out"
           style={{ transform: `translateX(-${startIndex * 25}%)` }}
         >
-          {items.map((item) => (
+          {data.map((item) => (
             <div key={item.id} className="w-1/4 flex-shrink-0 px-3">
               <MediaCard item={item} onWatchLater={onWatchLater} />
             </div>
