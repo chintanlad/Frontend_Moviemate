@@ -1,54 +1,65 @@
 "use client"
 
-import { useState, useEffect,React } from "react"
+import { useState, useEffect, React } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { Search, User, Clock, ChevronDown } from "lucide-react"
+import { Search, User, Clock, ChevronDown, Home } from "lucide-react"
 import axiosInstance from "../utils/axiosConfig"
 import { useAuth } from "../utils/authContext"
 
-export default function Navbar({ onLogoutClick }) {
+export default function Navbar({ onLogoutClick, setSearch }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
-  const {isLoggedIn,setIsLoggedIn} = useAuth()
+  const { isLoggedIn, setIsLoggedIn } = useAuth()
   const navigate = useNavigate()
+
   useEffect(() => {
-      if (!isLoggedIn) {
-        navigate("/"); // Navigate when logged in changes to true
-      }
-    }, [isLoggedIn, navigate]);
+    if (!isLoggedIn) {
+      navigate("/") // Navigate when logged in changes to true
+    }
+  }, [isLoggedIn, navigate])
+
   const handleLogout = async () => {
-    
-      try{
-        const res = await axiosInstance.post("/user/logout");
-        setIsLoggedIn(false);
-        navigate("/");
-        window.location.reload()
-      }
-      catch(e){
-        console.log(e);
-      }
+    try {
+      const res = await axiosInstance.post("/user/logout")
+      setIsLoggedIn(false)
+      navigate("/")
+      window.location.reload()
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    navigate("/searchResults")
   }
 
   return (
-    <nav className="bg-black">
+    <nav className="bg-black w-full">
       <div className="container mx-auto px-6">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center space-x-8">
+            <Link to="/" className="text-white hover:text-gray-300">
+              <Home className="h-6 w-6" />
+            </Link>
             <Link to="/" className="text-2xl font-bold text-white">
-              Metacritic
+              Movie Mate
             </Link>
             <div className="hidden md:flex space-x-6">
-              <NavLink href="/movies">Movies</NavLink>
+              <NavLink href="/movies">Recommanded Movies</NavLink>
             </div>
           </div>
 
           <div className="flex items-center space-x-6">
             <div className="relative">
-              <input
-                type="search"
-                placeholder="Search"
-                className="w-64 rounded-full bg-white/10 px-5 py-2 text-white placeholder-gray-400 focus:bg-white focus:text-black focus:outline-none"
-              />
-              <Search className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+              <form onSubmit={handleSubmit}>
+                <input
+                  onChange={(e) => setSearch(e.target.value)}
+                  type="search"
+                  placeholder="Search"
+                  className="w-64 rounded-full bg-white/10 px-5 py-2 text-white placeholder-gray-400 focus:bg-white focus:text-black focus:outline-none"
+                />
+                <Search className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+              </form>
             </div>
 
             <Link to="/watchlist" className="flex items-center space-x-2 text-white hover:text-gray-300">
@@ -67,7 +78,7 @@ export default function Navbar({ onLogoutClick }) {
               </button>
 
               {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-72 rounded-lg bg-white p-4 shadow-xl">
+                <div className="absolute right-0 mt-2 w-72 rounded-lg bg-white p-4 shadow-xl z-10" style={{zindex:5}}>
                   <ProfileMenu onClose={() => setIsProfileOpen(false)} />
                 </div>
               )}
@@ -95,20 +106,37 @@ function NavLink({ href, children }) {
 }
 
 function ProfileMenu({ onClose }) {
+  useEffect(()=>{fetchUserdata()},[])
   const [isEditing, setIsEditing] = useState(false)
   const [userData, setUserData] = useState({
-    username: "JohnDoe",
-    email: "john@example.com",
+  
   })
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsEditing(false)
-    // Save changes to backend
+    try{
+      const res = await axiosInstance.post("/user/updateUser",userData);
+      console.log(res);
+      setUserData(res.data)
+    }
+    catch(e){
+      console.log(e);
+    }
+  }
+  const fetchUserdata = async()=>{
+    try{
+      const res = await axiosInstance.get("/user");
+      console.log(res.data);
+      setUserData(res.data)
+    }
+    catch(e){
+      console.log(e);
+    }
   }
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between border-b pb-2">
+      <div className="flex items-center justify-between border-b pb-2 z-10">
         <h3 className="text-lg font-semibold">Profile</h3>
         {isEditing ? (
           <button onClick={handleSave} className="text-sm font-medium text-green-600 hover:text-green-700">

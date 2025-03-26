@@ -19,26 +19,7 @@ export default function ReviewForm({ onSubmit, onCancel }) {
         <label className="block text-sm font-medium text-gray-700">
           Your Rating
         </label>
-        <div className="mt-1 flex space-x-1">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <button
-              key={star}
-              type="button"
-              onClick={() => setRating(star)}
-              onMouseEnter={() => setHoveredRating(star)}
-              onMouseLeave={() => setHoveredRating(0)}
-              className="p-1"
-            >
-              <Star
-                className={`h-8 w-8 ${
-                  (hoveredRating || rating) >= star
-                    ? 'fill-yellow-400 text-yellow-400'
-                    : 'fill-gray-200 text-gray-200'
-                }`}
-              />
-            </button>
-          ))}
-        </div>
+        
       </div>
 
       <div>
@@ -64,7 +45,7 @@ export default function ReviewForm({ onSubmit, onCancel }) {
         </button>
         <button
           type="submit"
-          disabled={!rating || !content.trim()}
+          disabled={!content.trim()}
           className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
         >
           Post Review

@@ -9,6 +9,8 @@ import MediaDetail from "./pages/MediaDetails"
 import WatchList from "./pages/WatchList"
 import { useAuth } from "./utils/authContext"
 import ProtectedRoute from "./utils/protectedRoute"
+import SearchResultsList from "./components/searchResults"
+import Recommanded from "./components/RecommendedMovies"
 
 export default function App() 
 {
@@ -16,6 +18,7 @@ export default function App()
     const [activeAuthTab, setActiveAuthTab] = useState("register")
     const [watchLaterList, setWatchLaterList] = useState([])
     const {isLoggedin} = useAuth();
+    const [searchText,setSearchText] = useState("");
     const handleWatchLater = (item) => 
     {
         setWatchLaterList((prev) => 
@@ -36,7 +39,10 @@ export default function App()
                     setIsAuthModalOpen(true)
                     setActiveAuthTab("register")
                 }}
+
+                setSearch = {setSearchText}
             />
+            
             <Routes>
                 <Route
                     path="/"
@@ -47,7 +53,9 @@ export default function App()
                     }
                 />
                 <Route path="/title/:id" element={<MediaDetail onWatchLater={handleWatchLater} />} />
+                <Route path="/movies" element={<Recommanded/>}/>
                 <Route path="/watchlist" element={<WatchList items={watchLaterList} onWatchLater={handleWatchLater} />} />
+                <Route path="/searchResults" element={<SearchResultsList searchTerm={searchText} /> }/>
             </Routes>
         </ProtectedRoute>
         </div>
