@@ -176,7 +176,7 @@ export default function MediaDetail({ onWatchLater, user }) {
             {media?.average_rating>3?<div className="rounded-full bg-green-500 p-4 text-2xl font-bold text-white">
                 {media?.average_rating }
               </div>:<div className="rounded-full bg-yellow-500 p-4 text-2xl font-bold text-white">
-                {media?.average_rating }
+                {Math.trunc(media?.average_rating * 10) / 10 }
               </div>}
               
               <div>
@@ -185,7 +185,7 @@ export default function MediaDetail({ onWatchLater, user }) {
               </div>
             </div>
 
-            {/* Rating Input */}
+            <WatchlistButton movieId={id}/>
             
               
           </div>
@@ -274,64 +274,68 @@ export default function MediaDetail({ onWatchLater, user }) {
 
           {/* Review List */}
           <div className="space-y-6">
-          {filteredReviews.map((review) => (
-  <div key={review.id} className="rounded-lg bg-gray-50">
-    <div className="flex items-start space-x-4 hover:bg-gray-200 transition duration-75 p-4 rounded-lg">
-      <div className="flex-1">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-medium">{review.author}</h3>
-            <div className="text-sm text-gray-600">{review.date}</div>
-          </div>
-          <div className="flex">
-            {[...Array(5)].map((_, index) => (
-              <Star
-                key={index}
-                className={`h-5 w-5 ${
-                  index < review.score // ✅ Corrected star logic
-                    ? "fill-yellow-400 text-yellow-400"
-                    : "fill-gray-200 text-gray-300"
-                }`}
-              />
-            ))}
-          </div>
-        </div>
+            {filteredReviews.length > 0 ? (
+              filteredReviews.map((review) => (
+                <div key={review.id} className="rounded-lg bg-gray-50">
+                  <div className="flex items-start space-x-4 hover:bg-gray-200 transition duration-75 p-4 rounded-lg">
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-medium">{review.author}</h3>
+                          <div className="text-sm text-gray-600">{review.date}</div>
+                        </div>
+                        <div className="flex">
+                          {[...Array(5)].map((_, index) => (
+                            <Star
+                              key={index}
+                              className={`h-5 w-5 ${
+                                index < review.score // ✅ Corrected star logic
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "fill-gray-200 text-gray-300"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
 
-        <p className="mt-2 text-gray-700">
-          {review.content.length > 200 ? (
-            <>
-              {review.content.slice(0, 200)}...
-              <button
-                onClick={() => setSelectedReview(review)}
-                className="ml-2 text-blue-500 hover:underline"
-              >
-                Read More
-              </button>
-            </>
-          ) : (
-            review.content
-          )}
-        </p>
+                      <p className="mt-2 text-gray-700">
+                        {review.content.length > 200 ? (
+                          <>
+                            {review.content.slice(0, 200)}...
+                            <button
+                              onClick={() => setSelectedReview(review)}
+                              className="ml-2 text-blue-500 hover:underline"
+                            >
+                              Read More
+                            </button>
+                          </>
+                        ) : (
+                          review.content
+                        )}
+                      </p>
 
-        <div className="mt-4 flex items-center space-x-4 text-sm text-gray-500">
-          {review.canEdit && (
-            <div className="flex space-x-2">
-             
-              <button
-                onClick={() => handleDeleteReview(review.id)}
-                className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-              >
-                Delete
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  </div>
-))}
-
-
+                      <div className="mt-4 flex items-center space-x-4 text-sm text-gray-500">
+                        {review.canEdit && (
+                          <div className="flex space-x-2">
+                           
+                            <button
+                              onClick={() => handleDeleteReview(review.id)}
+                              className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                No reviews till now.
+              </div>
+            )}
           </div>
         </div>
 
@@ -368,3 +372,54 @@ export default function MediaDetail({ onWatchLater, user }) {
     </div>
   );
 }
+
+const WatchlistButton = ({ movieId }) => {
+  const [isInWatchlist, setIsInWatchlist] = useState(false);
+
+
+  useEffect(() => {
+    const checkWatchlist = async () => {
+      try {
+        const response = await axiosInstance.get(`/user/getWatchlist`);
+        const watchlist = response.data; 
+        console.log(watchlist)
+        setIsInWatchlist(watchlist?.some(movie=>movie._id == movieId));
+      } catch (error) {
+        console.error("Error checking watchlist:", error);
+      }
+    };
+
+    checkWatchlist();
+  }, [ movieId]);
+
+  // Function to add to watchlist
+  const addToWatchlist = async () => {
+    try {
+      await axiosInstance.post(`/user/addToWatchlist`, { movie_id:movieId });
+      setIsInWatchlist(true);
+    } catch (error) {
+      console.error("Error adding to watchlist:", error);
+    }
+  };
+
+  // Function to remove from watchlist
+  const removeFromWatchlist = async () => {
+    try {
+      await axiosInstance.post(`/user/removeFromWatchlist`, { movie_id:movieId });
+      setIsInWatchlist(false);
+    } catch (error) {
+      console.error("Error removing from watchlist:", error);
+    }
+  };
+
+  return (
+    <button
+      onClick={isInWatchlist ? removeFromWatchlist : addToWatchlist}
+      className={`px-4 py-2 rounded-md text-white ${
+        isInWatchlist ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600"
+      }`}
+    >
+      {isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
+    </button>
+  );
+};

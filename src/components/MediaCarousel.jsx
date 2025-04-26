@@ -62,7 +62,7 @@ export default function MediaCarousel({ items, onWatchLater }) {
           style={{ transform: `translateX(-${startIndex * 25}%)` }}
         >
           {data.map((item) => (
-            <div key={item.id} className="w-1/4 py-4 flex-shrink-0 px-3">
+            <div key={item._id} className="w-1/4 py-4 flex-shrink-0 px-3">
               <MediaCard item={item} onWatchLater={onWatchLater} />
             </div>
           ))}

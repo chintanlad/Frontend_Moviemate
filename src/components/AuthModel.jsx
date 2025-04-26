@@ -63,6 +63,7 @@ export default function AuthModal({ isOpen, onClose, activeTab, onTabChange }) {
       onTabChange("signin");
     } catch (error) {
       setMessage({ text: error.response?.data?.message || "Registration failed", type: "error" });
+      console.log(error)
     }
   }
 
